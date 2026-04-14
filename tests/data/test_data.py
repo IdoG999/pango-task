@@ -1,0 +1,7 @@
+BASE_URL = "http://localhost:5000"
+APP_USERNAME = "admin"
+APP_PASSWORD = "password"
+
+INVALID_SLOT_VALUE = "ABC@@"
+VALID_PLATE_A = "24681357"
+VALID_PLATE_B = "97531864"
