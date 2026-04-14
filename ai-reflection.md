@@ -13,6 +13,8 @@ Once the exploratory findings were clear, I converted them into structured deliv
 - representative test cases
 - automation scenarios tied to the most critical risks
 
+I also worked with a clear branch workflow. I created dedicated branches for each stage of the task, completed each part in its own branch, and then merged each completed branch into `main`. This helped me keep the work organized, reduce risk, and align with the assignment process.
+
 ## How I thought through the task
 
 My main thinking process was risk-first and impact-first. I asked myself: "If this breaks in production, what hurts the user and the business the most?" That is why I started from Dashboard flows and not from less critical areas.
