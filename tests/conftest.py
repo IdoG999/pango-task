@@ -1,71 +1,23 @@
 import os
-from typing import Iterable
 
 import pytest
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import sync_playwright
+
+from tests.data import test_data
+from tests.pages.dashboard_page import DashboardPage
+from tests.pages.login_page import LoginPage
 
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:5000")
-APP_USERNAME = os.getenv("APP_USERNAME", "admin")
-APP_PASSWORD = os.getenv("APP_PASSWORD", "password")
-
-
-def _first_visible_locator(page: Page, selectors: Iterable[str]):
-    for selector in selectors:
-        locator = page.locator(selector).first
-        if locator.count() > 0:
-            return locator
-    raise AssertionError(f"None of selectors matched: {selectors}")
-
-
-def fill_with_fallback(page: Page, selectors: Iterable[str], value: str) -> None:
-    locator = _first_visible_locator(page, selectors)
-    locator.fill(value)
-
-
-def click_with_fallback(page: Page, selectors: Iterable[str]) -> None:
-    locator = _first_visible_locator(page, selectors)
-    locator.click()
-
-
-def login(page: Page, username: str = APP_USERNAME, password: str = APP_PASSWORD) -> None:
-    page.goto(BASE_URL, wait_until="domcontentloaded")
-    fill_with_fallback(
-        page,
-        [
-            'input[name="username"]',
-            'input[name="email"]',
-            'input[type="email"]',
-            'input[placeholder*="user" i]',
-            'input[placeholder*="email" i]',
-        ],
-        username,
-    )
-    fill_with_fallback(
-        page,
-        [
-            'input[name="password"]',
-            'input[type="password"]',
-            'input[placeholder*="password" i]',
-        ],
-        password,
-    )
-    click_with_fallback(
-        page,
-        [
-            'button:has-text("Sign In")',
-            'button:has-text("Login")',
-            'button[type="submit"]',
-        ],
-    )
-
-    page.wait_for_timeout(1000)
+BASE_URL = os.getenv("BASE_URL", test_data.BASE_URL)
+APP_USERNAME = os.getenv("APP_USERNAME", test_data.APP_USERNAME)
+APP_PASSWORD = os.getenv("APP_PASSWORD", test_data.APP_PASSWORD)
+HEADLESS = os.getenv("HEADLESS", "true").lower() != "false"
 
 
 @pytest.fixture(scope="session")
 def browser():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=HEADLESS)
         yield browser
         browser.close()
 
@@ -76,3 +28,21 @@ def page(browser):
     page = context.new_page()
     yield page
     context.close()
+
+
+@pytest.fixture()
+def login_page(page):
+    return LoginPage(page)
+
+
+@pytest.fixture()
+def dashboard_page(page):
+    return DashboardPage(page)
+
+
+@pytest.fixture()
+def authenticated_dashboard(login_page, dashboard_page):
+    login_page.open(BASE_URL)
+    login_page.login(APP_USERNAME, APP_PASSWORD)
+    dashboard_page.open()
+    return dashboard_page

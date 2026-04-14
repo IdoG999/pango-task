@@ -1,31 +1,43 @@
 # Part 2 - Automation
 
-This branch contains automation for two high-value Dashboard scenarios from `test-plan.md`:
+This part automates meaningful scenarios from `test-plan.md` with a focus on high and critical risk areas.
 
-1. Slot input validation
-2. Prevent duplicate slot assignment
+## Why These Scenarios
 
-Why these were chosen:
-- Both are directly tied to critical/major Dashboard risks from Part 1.
-- Both protect core parking integrity and reduce regression risk.
-- Both provide meaningful value in repeated CI/local runs.
+I prioritized scenarios that protect the core parking flow and catch high-impact regressions:
 
-## Stack
+1. Slot input validation (BUG-02 / TC-07)
+2. Duplicate slot assignment behavior (BUG-03 / TC-06)
+
+I also included authentication smoke coverage to support stable test flow:
+
+3. Valid login (TC-01)
+4. Invalid login handling (TC-02)
+
+## Tech Stack
 
 - Python
 - Pytest
 - Playwright
 
+## Project Structure
+
+- `tests/test_dashboard_automation.py` - Dashboard automation scenarios
+- `tests/test_authentication.py` - Authentication smoke scenarios
+- `tests/pages/` - Page Objects (`base_page.py`, `login_page.py`, `dashboard_page.py`)
+- `tests/data/test_data.py` - Shared test data/constants
+- `tests/conftest.py` - Browser setup and reusable fixtures
+
 ## Setup
 
-1. Start the application locally:
+1) Start the app:
 
 ```bash
 docker pull --platform linux/amd64 doringber/parking-manager:3.1.0
 docker run --platform linux/amd64 -d -p 5000:5000 --name parking-manager doringber/parking-manager:3.1.0
 ```
 
-2. Install test dependencies:
+2) Create and activate virtual environment, then install dependencies:
 
 ```bash
 python3 -m venv .venv
@@ -34,29 +46,65 @@ pip install -r requirements.txt
 python -m playwright install
 ```
 
-## Run tests
+## Verify venv Before Running Tests
 
 ```bash
-pytest
+echo $VIRTUAL_ENV
+which python
+```
+
+Expected:
+- `$VIRTUAL_ENV` is not empty
+- `which python` points to `.venv/bin/python`
+
+If not active:
+
+```bash
+source .venv/bin/activate
+```
+
+## Run Tests (CLI / Headless)
+
+Run all tests:
+
+```bash
+pytest -rA
+```
+
+Run only high + critical tests:
+
+```bash
+pytest -m "high and critical" -rA
+```
+
+## Run Tests in Browser (Headed)
+
+```bash
+HEADLESS=false pytest -rA -s
+```
+
+Optional debug mode:
+
+```bash
+PWDEBUG=1 HEADLESS=false pytest -s
 ```
 
 ## Configuration
 
-Environment variables:
 - `BASE_URL` (default: `http://localhost:5000`)
 - `APP_USERNAME` (default: `admin`)
 - `APP_PASSWORD` (default: `password`)
+- `HEADLESS` (default: `true`)
 
 Example:
 
 ```bash
-BASE_URL=http://localhost:5000 APP_USERNAME=admin APP_PASSWORD=password pytest
+BASE_URL=http://localhost:5000 APP_USERNAME=admin APP_PASSWORD=password pytest -rA
 ```
 
-## Reliability and maintainability notes
+## Reliability and Maintainability
 
-- Reusable helpers are placed in `tests/conftest.py` for login and selector fallbacks.
-- Tests use multiple selector candidates to reduce breakage from minor UI changes.
-- Assertions use user-visible validation/error patterns for behavior-level confidence.
-- Each test is independent and focused on one business rule.
-- Both tests are marked `xfail` because they encode expected product behavior for known Part 1 defects; this keeps the suite stable while still tracking regression targets.
+- Page Object Model keeps selectors and UI actions out of tests.
+- Shared fixtures reduce duplication and keep tests readable.
+- Centralized test data makes scenarios easier to maintain.
+- Selector fallback and controlled waits improve stability across UI changes.
