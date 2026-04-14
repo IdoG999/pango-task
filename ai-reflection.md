@@ -4,12 +4,22 @@
 
 I started by installing Docker and running the application locally. I explored the system manually and documented bugs during exploration. I then organized the assignment in a dedicated local project folder and created a public GitHub repository for submission.
 
+My working approach was to lead with my own QA knowledge and decision-making, and use AI as a force multiplier. I used my experience to define priorities, expected behavior, and risk areas, while AI helped me execute faster and keep the output structured.
+
 From a QA perspective, I made an early priority decision to focus on the Dashboard because it contains the core parking flow and has the highest business impact. After that, I expanded coverage to History and Users.
 
 Once the exploratory findings were clear, I converted them into structured deliverables:
 - a prioritized manual test plan
 - representative test cases
 - automation scenarios tied to the most critical risks
+
+## How I thought through the task
+
+My main thinking process was risk-first and impact-first. I asked myself: "If this breaks in production, what hurts the user and the business the most?" That is why I started from Dashboard flows and not from less critical areas.
+
+I balanced product behavior and test reliability. I did not just collect bugs; I grouped them by impact and by how realistic they are in daily usage. In parallel, I made sure the automated scenarios were meaningful, repeatable, and connected directly to the manual findings.
+
+Another decision was to keep the scope focused. Instead of trying to automate everything, I chose a smaller set of high-value scenarios and implemented them cleanly, with clear structure and reusable components. For me, this is a stronger QA approach than writing many weak tests.
 
 ## Trade-offs I made and why
 
@@ -35,6 +45,8 @@ Cursor helped me move faster in several areas:
 - refactoring tests into a cleaner structure (pages, fixtures, test data)
 - tightening assertions and improving readability
 
-At the same time, I did not rely on AI output blindly. I validated behavior by running tests locally and manually reviewing flows in the browser. This was important because generated selectors and assumptions can be inaccurate without runtime verification.
+The key point is that AI improved speed and consistency, but my own knowledge drove the actual QA decisions. I chose what to test, how to prioritize, how to structure the automation, and how to validate outcomes.
 
-The main limitation was that AI suggestions sometimes required adjustment to match the real UI behavior. Human QA judgment was still necessary for prioritization, expected outcomes, and final quality decisions.
+At the same time, I never rely on AI output blindly. I always validate behavior by running tests locally and manually reviewing flows in the browser. This is important because generated selectors and assumptions can be inaccurate without runtime verification.
+
+The main limitation is that AI suggestions sometimes need adjustments to match real UI behavior. Human QA judgment remains critical for prioritization, expected outcomes, and final quality decisions.
